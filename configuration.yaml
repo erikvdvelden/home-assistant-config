@@ -12,7 +12,7 @@ homeassistant:
   time_zone: Europe/Amsterdam
 
 # Show links to resources in log and frontend
-introduction:
+# introduction:
 
 # Enables the frontend
 frontend:
@@ -66,4 +66,48 @@ mqtt:
   username: !secret mqtt_user
   password: !secret mqtt_pwd
 
-
+light:
+  # these lights are setup with the 433MQTTBridge, which uses pilight json
+  # disadvangate is that the state includes the unit number and is not distinguishable by topic
+  - platform: mqtt_template
+    name: kitchen
+    command_topic: "rf434/send/arctech_switch"
+    state_topic: "rf434/recv/arctech_switch/4860734"
+    command_on_template: '{"id":4860734,"unit":0,"on":1}'
+    command_off_template: '{"id":4860734,"unit":0,"off":1}'
+    state_template: '{% if  value_json.unit == 0  %} {{ value_json.state }} {% endif %}'
+  - platform: mqtt_template
+    name: bookcase
+    command_topic: "rf434/send/arctech_switch"
+    state_topic: "rf434/recv/arctech_switch/4860734"
+    command_on_template: '{"id":4860734,"unit":1,"on":1}'
+    command_off_template: '{"id":4860734,"unit":1,"off":1}'
+    state_template: '{% if  value_json.unit == 1  %} {{ value_json.state }} {% endif %}'
+  - platform: mqtt_template
+    name: kitchen
+    command_topic: "rf434/send/arctech_switch"
+    state_topic: "rf434/recv/arctech_switch/4860734"
+    command_on_template: '{"id":4860734,"unit":2,"on":1}'
+    command_off_template: '{"id":4860734,"unit":2,"off":1}'
+    state_template: '{% if  value_json.unit == 2  %} {{ value_json.state }} {% endif %}'
+  - platform: mqtt_template
+    name: livingroom
+    command_topic: "rf434/send/arctech_switch"
+    state_topic: "rf434/recv/arctech_switch/10942094"
+    command_on_template: '{"id":10942094,"unit":0,"on":1}'
+    command_off_template: '{"id":10942094,"unit":0,"off":1}'
+    state_template: '{% if  value_json.unit == 0  %} {{ value_json.state }} {% endif %}'
+  - platform: mqtt_template
+    name: ikea
+    command_topic: "rf434/send/arctech_switch"
+    state_topic: "rf434/recv/arctech_switch/10942094"
+    command_on_template: '{"id":10942094,"unit":1,"on":1}'
+    command_off_template: '{"id":10942094,"unit":1,"off":1}'
+    state_template: '{% if  value_json.unit == 1  %} {{ value_json.state }} {% endif %}'
+  - platform: mqtt_template
+    name: table
+    command_topic: "rf434/send/arctech_switch"
+    state_topic: "rf434/recv/arctech_switch/10942094"
+    command_on_template: '{"id":10942094,"unit":2,"on":1}'
+    command_off_template: '{"id":10942094,"unit":2,"off":1}'
+    state_template: '{% if  value_json.unit == 2  %} {{ value_json.state }} {% endif %}'
