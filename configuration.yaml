@@ -50,7 +50,52 @@ sun:
 
 # Weather Prediction
 sensor:
-  platform: yr
+  - platform: yr
+  - platform: mqtt
+    state_topic: "/sensornode/livingroom/DHT/status"
+    name: "Humidity"
+    unit_of_measurement: "%"
+    value_template: '{{ value_json.humidity }}'
+  - platform: mqtt
+    state_topic: "/sensornode/livingroom/BMP/status"
+    name: "Pressure"
+    unit_of_measurement: "mpa"
+    value_template: '{{ value_json.pressure }}'
+  - platform: mqtt
+    state_topic: "/sensornode/livingroom/BMP/status"
+    name: "temperature"
+    unit_of_measurement: "C"
+    value_template: '{{ value_json.temp }}'
+  - platform: mqtt
+    state_topic: "/sensornode/bedroom/SHT/status"
+    name: "Humidity bedroom"
+    unit_of_measurement: "%"
+    value_template: '{{ value_json.pressure }}'
+  - platform: mqtt
+    state_topic: "/sensornode/bedroom/SHT/status"
+    name: "temp bedroom"
+    unit_of_measurement: "C"
+    value_template: '{{ value_json.temp }}'
+
+binary_sensor:
+  - platform: mqtt
+    state_topic: "/sensornode/bedroom/RADAR/status"
+    name: "movement bedroom"
+    payload_on: 1
+    payload_off: 0
+    value_template: '{{ value_json.status }}'
+  - platform: mqtt
+    state_topic: "/sensornode/livingroom/PIR/status"
+    name: "movement"
+    payload_on: 1
+    payload_off: 0
+    value_template: '{{ value_json.status }}'
+  - platform: mqtt
+    state_topic: "/sensornode/livingroom/sound/status"
+    name: "sound"
+    payload_on: 1
+    payload_off: 0
+    value_template: '{{ value_json.status }}'
 
 # Text to speech
 tts:
@@ -111,5 +156,15 @@ light:
     command_on_template: '{"id":10942094,"unit":2,"on":1}'
     command_off_template: '{"id":10942094,"unit":2,"off":1}'
     state_template: '{% if  value_json.unit == 2  %} {{ value_json.state }} {% endif %}'
+  - platform: mqtt_json
+    name: lichtstraat
+    state_topic: "home/rgb1"
+    command_topic: "home/rgb1/set"
+    brightness: true
+    rgb: true
+    optimistic: false
+    qos: 0
 
 script: !include scripts.yaml
+
+

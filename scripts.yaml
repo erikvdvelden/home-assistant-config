@@ -36,6 +36,9 @@ lights_off:
     - service: light.turn_off
       data:
         entity_id: light.table
+    - service: light.turn_off
+      data:
+        entity_id: light.lichtstraat
 basis_on:
   alias: basis on
   sequence:
