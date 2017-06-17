@@ -1,1 +1,22 @@
-[]
+- alias: prepare for bed
+  trigger:
+    platform: time
+    at: '23:59:59'
+  action:
+    service: script.everything_off
+- alias: wake up 
+  trigger:
+    platform: time
+    at: '06:00:00'
+  condition:
+    condition: sun
+    after: sunrise
+    after_offset: "-00:45:00"
+  action:
+    service: script.basis_on
+- alias: sunrise
+  trigger:
+    platform: sun
+    event: sunrise
+  action:
+    service: script.lights_off

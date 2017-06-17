@@ -1,0 +1,57 @@
+everything_off:
+  alias: everything off
+  sequence:
+    - service: media_player.turn_off
+      data:
+        entity_id: media_player.raspberrypi
+    - service: script.lights_off
+lights_off:
+  alias: lights off
+  sequence:
+    - service: light.turn_off
+      data:
+        entity_id: light.livingroom
+    - delay:
+        seconds: 1
+    - service: light.turn_off
+      data:
+        entity_id: light.bookcase
+    - delay:
+        seconds: 1
+    - service: light.turn_off
+      data:
+        entity_id: light.kitchen
+    - delay:
+        seconds: 1
+    - service: light.turn_off
+      data:
+        entity_id: light.couch
+    - delay:
+        seconds: 1
+    - service: light.turn_off
+      data:
+        entity_id: light.ikea
+    - delay:
+        seconds: 1
+    - service: light.turn_off
+      data:
+        entity_id: light.table
+basis_on:
+  alias: basis on
+  sequence:
+    - service: media_player.turn_on
+      data:
+        entity_id: media_player.raspberrypi
+    - service: light.turn_on
+      data:
+        entity_id: light.livingroom
+    - delay:
+        seconds: 1
+    - service: light.turn_on
+      data:
+        entity_id: light.bookcase
+    - delay:
+        seconds: 1
+    - service: light.turn_on
+      data:
+        entity_id: light.kitchen
