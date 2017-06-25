@@ -76,6 +76,22 @@ sensor:
     name: "temp bedroom"
     unit_of_measurement: "C"
     value_template: '{{ value_json.temp }}'
+  - platform: mqtt
+    state_topic: "rf434/recv/alecto_ws1700/246"
+    name: "outside humidity"
+    unit_of_measurement: "%"
+    value_template: '{{ value_json.humidity }}'
+  - platform: mqtt
+    state_topic: "rf434/recv/alecto_ws1700/246"
+    name: "outside temp"
+    unit_of_measurement: "C"
+    value_template: '{{ value_json.temperature }}'
+  - platform: mqtt
+    state_topic: "rf434/recv/alecto_ws1700/246"
+    name: "outside battery"
+    unit_of_measurement: "%"
+    value_template: '{{ value_json.battery }}'
+
 
 binary_sensor:
   - platform: mqtt
@@ -167,4 +183,5 @@ light:
 
 script: !include scripts.yaml
 
-
+device_tracker:
+  - platform: bluetooth_tracker

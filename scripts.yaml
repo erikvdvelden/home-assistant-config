@@ -58,3 +58,43 @@ basis_on:
     - service: light.turn_on
       data:
         entity_id: light.kitchen
+buzzer_loop:
+  alias: buzzer loop
+  sequence:
+  - service: mqtt.publish
+    data:
+      {"topic" : "/sensornode/livingroom/buzzer/command", "payload" : "{state : 1}"}
+  - delay:
+     seconds: 1
+  - service: mqtt.publish
+    data:
+      {"topic" : "/sensornode/livingroom/buzzer/command", "payload" : "{state : 0}"}
+  - service: script.turn_on
+    data:
+      entity_id: script.buzzer_loop2
+buzzer_loop2:
+  alias: buzzer loop helper
+  sequence:
+  - delay:
+     seconds: 1
+  - service: script.turn_on
+    data:
+      entity_id: script.buzzer_loop
+flash_leds_red:
+  alias: flash red
+  sequence:
+  - service: mqtt.publish
+    data:
+      {"topic" :  "home/rgb1/set", "payload" : "{brightness: 255,color: {r: 255, g: 0,b: 0},flash : 5}"}
+flash_leds_green:
+  alias: flash green
+  sequence:
+  - service: mqtt.publish
+    data:
+      {"topic" :  "home/rgb1/set", "payload" : "{brightness: 255,color: {r: 0, g: 255,b: 0},flash : 5}"}
+flash_leds_blue:
+  alias: flash blue
+  sequence:
+  - service: mqtt.publish
+    data:
+      {"topic" :  "home/rgb1/set", "payload" : "{brightness: 255,color: {r: 0, g: 0,b: 255},flash : 5}"}

@@ -20,3 +20,11 @@
     event: sunrise
   action:
     service: script.lights_off
+- alias: sunset
+  trigger:
+    platform: sun
+    event: sunset
+    offset: '-00:45:00'
+  action:
+    service: script.basis_on
+
