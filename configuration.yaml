@@ -91,6 +91,11 @@ sensor:
     name: "outside battery"
     unit_of_measurement: "%"
     value_template: '{{ value_json.battery }}'
+  - platform: command_line
+    name: CPU Temperature
+    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    unit_of_measurement: "C"
+    value_template: '{{ value | multiply(0.001) }}'
 
 
 binary_sensor:
@@ -112,6 +117,11 @@ binary_sensor:
     payload_on: 1
     payload_off: 0
     value_template: '{{ value_json.status }}'
+#  - platform: mqtt
+#    state_topic: "rf434/recv/arctech_screen_old/18"
+#    name: "door open"
+#    payload_on: "down"
+#    value_template: '{{ value_json.state }}'
 
 # Text to speech
 tts:
@@ -184,4 +194,10 @@ light:
 script: !include scripts.yaml
 
 device_tracker:
-  - platform: bluetooth_tracker
+  - platform: luci
+    host: 192.168.0.254
+    username: !secret router_user
+    password: !secret router_pwd
+    track_new_devices: false
+    interval_seconds: 12
+    consider_home: 120

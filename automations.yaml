@@ -27,4 +27,10 @@
     offset: '-00:45:00'
   action:
     service: script.basis_on
-
+- alias: door sensor
+  trigger:
+    platform: mqtt
+    topic: "rf434/recv/arctech_screen_old/18"
+    payload: '{"id":18,"unit":0,"state":"down"}'
+  action:
+    service: script.flash_leds_red
