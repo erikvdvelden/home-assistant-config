@@ -98,3 +98,14 @@ flash_leds_blue:
   - service: mqtt.publish
     data:
       {"topic" :  "home/rgb1/set", "payload" : "{brightness: 255,color: {r: 0, g: 0,b: 255},flash : 5}"}
+doorbell:
+  alias: doorbell
+  sequence:
+  - service: script.flash_leds_blue
+  - service: notify.dog
+    data:
+      message: 'somebody at the door'
+  - service: notify.doorbell
+    data:
+      title: 'doorbell'
+      message: 'somebody at the door'

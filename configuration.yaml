@@ -201,3 +201,20 @@ device_tracker:
     track_new_devices: false
     interval_seconds: 12
     consider_home: 120
+
+notify:
+  - name: doorbell
+    platform: smtp
+    server: smtp.aol.com
+    port: 587
+    timeout: 15
+    sender: !secret email
+    encryption: starttls
+    username: !secret email
+    password: !secret emailpwd
+    recipient:
+      - erik.van.der.velden@gmail.com
+    sender_name: DOORBELL
+  - name: dog
+    platform: command_line
+    command: "aplay /home/homeassistant/Dog-barking-very-loudly.wav"
