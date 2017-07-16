@@ -11,13 +11,14 @@
   condition:
     condition: sun
     before: sunrise
-    before_offset: "-00:45:00"
+    before_offset: "00:45:00"
   action:
     service: script.basis_on
 - alias: sunrise
   trigger:
     platform: sun
     event: sunrise
+    offset: "00:45:00"
   action:
     service: script.lights_off
 - alias: sunset
@@ -29,15 +30,37 @@
     service: script.basis_on
 - alias: door sensor
   trigger:
-    platform: mqtt
-    topic: "rf434/recv/arctech_screen_old/18"
-    payload: '{"id":18,"unit":0,"state":"down"}'
+    - platform: mqtt
+      topic: "rf434/recv/arctech_screen_old/18"
+      payload: '{"id":18,"unit":0,"state":"down"}'
+    - platform: mqtt
+      topic: "rf434/recv/arctech_screen_old/18"
+      payload: '{"id":18,"unit":0,"state":"up"}'
+  condition:
+    condition: state
+    entity_id: group.all_devices
+    state: 'not_home'
   action:
-    service: script.flash_leds_red
+    service: script.backdoor_open
 - alias: door sensor
   trigger:
     platform: mqtt
     topic: "/sensornode/closet/bell/status"
     payload: '{"status":1}'
+  condition: 
+    condition: state
+    entity_id: group.all_devices
+    state: 'not_home'
   action:
     service: script.doorbell
+- alias: back motion sensor 
+  trigger:
+    platform: mqtt
+    topic: "rf434/recv/arctech_screen_old/0"
+    payload: '{"id":0,"unit":0,"state":"up"}'
+  condition:
+    condition: state
+    entity_id: group.all_devices
+    state: 'not_home'
+  action:
+    service: script.backmotion

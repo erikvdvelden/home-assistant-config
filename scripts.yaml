@@ -109,3 +109,33 @@ doorbell:
     data:
       title: 'doorbell'
       message: 'somebody at the door'
+backdoor_open:
+  alias: backdoor open
+  sequence:
+  - service: script.flash_leds_red
+  - service: notify.doorbell
+    data: 
+      title: 'backdoor open'
+      message: 'backdoor is open'
+backmotion:
+  alias: back door motion
+  sequence:
+  - service: script.flash_leds_green
+  - service: light.turn_on
+    entity_id: light.couch
+  - service: notify.doorbell
+    data: 
+      title: 'backdoor movement'
+      message: 'backdoor movement'
+  - delay:
+     seconds: 1
+  - service: light.turn_on
+    entity_id: light.livingroom
+  - delay:
+     minutes: 1
+  - service: light.turn_off
+    entity_id: light.livingroom
+  - delay:
+     seconds: 1
+  - service: light.turn_off
+    entity_id: light.couch

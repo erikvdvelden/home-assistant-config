@@ -195,7 +195,7 @@ script: !include scripts.yaml
 
 device_tracker:
   - platform: luci
-    host: 192.168.0.254
+    host: 192.168.0.1
     username: !secret router_user
     password: !secret router_pwd
     track_new_devices: false
@@ -218,3 +218,28 @@ notify:
   - name: dog
     platform: command_line
     command: "aplay /home/homeassistant/Dog-barking-very-loudly.wav"
+
+android_ip_webcam:
+  - host: 192.168.0.120
+    name: nexus 4
+    username: !secret camera_user
+    password: !secret camera_pwd
+    sensors:
+    - audio_connections
+    - battery_level
+    - battery_temp
+    - battery_voltage
+    - light
+    - motion
+    - pressure
+    switches:
+    - exposure_lock
+    - ffc
+    - focus
+    - gps_active
+    - night_vision
+    - overlay
+    - torch
+    - whitebalance_lock
+    - video_recording
+    motion_sensor: true
