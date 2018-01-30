@@ -1,17 +1,62 @@
-- alias: prepare for bed
+- alias: prepare for bed week
   trigger:
     platform: time
     at: '23:59:59'
+  condition:
+    - condition: time
+      weekday:
+      - sun
+      - mon
+      - tue
+      - wed
+      - thu
   action:
     service: script.everything_off
-- alias: wake up 
+- alias: prepare for bed weekend
+  trigger:
+    platform: time
+    at: '00:59:59'
+  condition:
+    - condition: time
+      weekday:
+      - thu
+      - fri
+      - sat
+  action:
+    service: script.everything_off
+- alias: wake up weekday
   trigger:
     platform: time
     at: '06:00:00'
   condition:
-    condition: sun
-    before: sunrise
-    before_offset: "00:45:00"
+  - condition: and
+    conditions: 
+    - condition: time
+      weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+    - condition: sun
+      before: sunrise
+      before_offset: "00:45:00"
+  action:
+    service: script.basis_on
+- alias: wake up weekend
+  trigger:
+    platform: time
+    at: '08:30:00'
+  condition:
+  - condition: and
+    conditions: 
+    - condition: time
+      weekday:
+      - fri
+      - sat
+      - sun
+    - condition: sun
+      before: sunrise
+      before_offset: "00:45:00"
   action:
     service: script.basis_on
 - alias: sunrise
@@ -38,19 +83,15 @@
       payload: '{"id":18,"unit":0,"state":"up"}'
   condition:
     condition: state
-    entity_id: group.all_devices
-    state: 'not_home'
+    entity_id: device_tracker.erik
+    state: not_home
   action:
     service: script.backdoor_open
-- alias: door sensor
+- alias: bell
   trigger:
     platform: mqtt
     topic: "/sensornode/closet/bell/status"
     payload: '{"status":1}'
-  condition: 
-    condition: state
-    entity_id: group.all_devices
-    state: 'not_home'
   action:
     service: script.doorbell
 - alias: back motion sensor 
@@ -60,7 +101,43 @@
     payload: '{"id":0,"unit":0,"state":"up"}'
   condition:
     condition: state
-    entity_id: group.all_devices
-    state: 'not_home'
+    entity_id: device_tracker.erik
+    state: not_home
   action:
     service: script.backmotion
+- alias: trigger everything off
+  trigger: 
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00012456f2
+        click_type: single
+    - platform: event
+      event_type: cube_action
+      event_data: 
+        entity_id: binary_sensor.cube_158d00010df2f8
+        action_value: tap_twice
+  condition:
+    condition: state
+    entity_id: light.livingroom
+    state: 'on'
+  action:
+    service: script.everything_off
+- alias: trigger basis on
+  trigger: 
+    - platform: event
+      event_type: 'click'
+      event_data:
+        entity_id: binary_sensor.switch_158d00012456f2
+        click_type: single
+    - platform: event
+      event_type: cube_action
+      event_data: 
+        entity_id: binary_sensor.cube_158d00010df2f8
+        action_value: tap_twice
+  condition:
+    condition: state
+    entity_id: light.livingroom
+    state: 'off'
+  action:
+    service: script.basis_on

@@ -5,6 +5,12 @@ everything_off:
       data:
         entity_id: media_player.raspberrypi
     - service: script.lights_off
+    - delay:
+        seconds: 1
+    - service: script.lights_off
+    - delay:
+        seconds: 1
+    - service: script.lights_off
 lights_off:
   alias: lights off
   sequence:
@@ -42,9 +48,6 @@ lights_off:
 basis_on:
   alias: basis on
   sequence:
-    - service: media_player.turn_on
-      data:
-        entity_id: media_player.raspberrypi
     - service: light.turn_on
       data:
         entity_id: light.livingroom
@@ -112,15 +115,27 @@ doorbell:
 backdoor_open:
   alias: backdoor open
   sequence:
-  - service: script.flash_leds_red
   - service: notify.doorbell
     data: 
       title: 'backdoor open'
       message: 'backdoor is open'
+frontdoor_open:
+  alias: frontdoor open
+  sequence:
+  - service: notify.doorbell
+    data: 
+      title: 'frontdoor open'
+      message: 'frontdoor is open'
+hal_motion:
+  alias: hall motion
+  sequence:
+  - service: notify.doorbell
+    data: 
+      title: 'hall motion'
+      message: 'hall motion detected'
 backmotion:
   alias: back door motion
   sequence:
-  - service: script.flash_leds_green
   - service: light.turn_on
     entity_id: light.couch
   - service: notify.doorbell
@@ -128,14 +143,11 @@ backmotion:
       title: 'backdoor movement'
       message: 'backdoor movement'
   - delay:
-     seconds: 1
-  - service: light.turn_on
-    entity_id: light.livingroom
-  - delay:
-     minutes: 1
-  - service: light.turn_off
-    entity_id: light.livingroom
-  - delay:
-     seconds: 1
+      minutes: 1
   - service: light.turn_off
     entity_id: light.couch
+skip_song:
+  alias: skip song
+  sequence:
+  - service: media_player.media_next_track
+    entity_id: media_player.raspberrypi

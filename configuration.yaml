@@ -1,7 +1,7 @@
 homeassistant:
   # Name of the location where Home Assistant is running
   name: Home
-  # Location required to calculate the time the sun rises and sets
+  # Locatio required to calculate the time the sun rises and sets
   latitude: !secret lat
   longitude: !secret lon
   # Impacts weather/sunrise data (altitude above sea level in meters)
@@ -22,9 +22,11 @@ config:
 
 http:
   # Uncomment this to add a password (recommended!)
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
   api_password: !secret pwd
-  # Uncomment this if you are using SSL or running in Docker etc
-  # base_url: example.duckdns.org:8123
+  # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+  base_url: https://sietske.duckdns.org:8123
 
 # Checks for available updates
 # Note: This component will send some information about your system to
@@ -32,6 +34,8 @@ http:
 # For more information, please see:
 # https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
 updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  include_used_components: true
 
 # Discover some devices automatically
 discovery:
@@ -39,7 +43,7 @@ discovery:
 # Allows you to issue voice commands from the frontend in enabled browsers
 conversation:
 
-# Enables support for tracking state changes over time.
+# Enables support for tracking state changes over time
 history:
 
 # View all events in a logbook
@@ -48,9 +52,26 @@ logbook:
 # Track the sun
 sun:
 
-# Weather Prediction
+# Text to speech
+tts:
+  - platform: google
+
+group: !include groups.yaml
+automation: !include automations.yaml
+
+#EVDV modifications start here
+
+mqtt:
+  # HASSIO internal address
+  broker: 172.17.0.1
+  client_id: home-assistant-1
+  username: !secret mqtt_user
+  password: !secret mqtt_pwd
+
+# Weather prediction
 sensor:
   - platform: yr
+#extra EVDV sensors
   - platform: mqtt
     state_topic: "/sensornode/livingroom/DHT/status"
     name: "Humidity"
@@ -97,7 +118,6 @@ sensor:
     unit_of_measurement: "C"
     value_template: '{{ value | multiply(0.001) }}'
 
-
 binary_sensor:
   - platform: mqtt
     state_topic: "/sensornode/bedroom/RADAR/status"
@@ -123,23 +143,51 @@ binary_sensor:
 #    payload_on: "down"
 #    value_template: '{{ value_json.state }}'
 
-# Text to speech
-tts:
-  platform: google
 
-group: !include groups.yaml
-automation: !include automations.yaml
-
-mqtt:
-  broker: chip
-  port: 1888
-  client_id: home-assistant-1
-  username: !secret mqtt_user
-  password: !secret mqtt_pwd
-
-light:
+#Lights
   # these lights are setup with the 433MQTTBridge, which uses pilight json
   # disadvangate is that the state includes the unit number and is not distinguishable by topic
+  # mapping to id
+  # kitchen 4860734 unit 0
+  # bookcase 4860734 unit 1
+  # couch 4860734 unit 2
+  # livingroom 10942094 unit 0
+  # ikea 10942094 unit 1
+  # table 10942094 unit 2
+
+light:
+  - platform: mqtt
+    name: "livingroom"
+    state_topic: "home/sonoff/1/stat"
+    command_topic: "home/sonoff/1"
+    payload_on: "on"
+    payload_off: "off"
+    qos: 1
+    retain: false
+  - platform: mqtt
+    name: "couch"
+    state_topic: "home/sonoff/3/stat"
+    command_topic: "home/sonoff/3"
+    payload_on: "on"
+    payload_off: "off"
+    qos: 1
+    retain: false
+  - platform: mqtt
+    name: "ikea"
+    state_topic: "home/sonoff/4/stat"
+    command_topic: "home/sonoff/4"
+    payload_on: "on"
+    payload_off: "off"
+    qos: 1
+    retain: false
+  - platform: mqtt
+    name: "table"
+    state_topic: "home/sonoff/2/stat"
+    command_topic: "home/sonoff/2"
+    payload_on: "on"
+    payload_off: "off"
+    qos: 1
+    retain: false
   - platform: mqtt_template
     name: kitchen
     command_topic: "rf434/send/arctech_switch"
@@ -154,53 +202,14 @@ light:
     command_on_template: '{"id":4860734,"unit":1,"on":1}'
     command_off_template: '{"id":4860734,"unit":1,"off":1}'
     state_template: '{% if  value_json.unit == 1  %} {{ value_json.state }} {% endif %}'
-  - platform: mqtt_template
-    name: couch
-    command_topic: "rf434/send/arctech_switch"
-    state_topic: "rf434/recv/arctech_switch/4860734"
-    command_on_template: '{"id":4860734,"unit":2,"on":1}'
-    command_off_template: '{"id":4860734,"unit":2,"off":1}'
-    state_template: '{% if  value_json.unit == 2  %} {{ value_json.state }} {% endif %}'
-  - platform: mqtt_template
-    name: livingroom
-    command_topic: "rf434/send/arctech_switch"
-    state_topic: "rf434/recv/arctech_switch/10942094"
-    command_on_template: '{"id":10942094,"unit":0,"on":1}'
-    command_off_template: '{"id":10942094,"unit":0,"off":1}'
-    state_template: '{% if  value_json.unit == 0  %} {{ value_json.state }} {% endif %}'
-  - platform: mqtt_template
-    name: ikea
-    command_topic: "rf434/send/arctech_switch"
-    state_topic: "rf434/recv/arctech_switch/10942094"
-    command_on_template: '{"id":10942094,"unit":1,"on":1}'
-    command_off_template: '{"id":10942094,"unit":1,"off":1}'
-    state_template: '{% if  value_json.unit == 1  %} {{ value_json.state }} {% endif %}'
-  - platform: mqtt_template
-    name: table
-    command_topic: "rf434/send/arctech_switch"
-    state_topic: "rf434/recv/arctech_switch/10942094"
-    command_on_template: '{"id":10942094,"unit":2,"on":1}'
-    command_off_template: '{"id":10942094,"unit":2,"off":1}'
-    state_template: '{% if  value_json.unit == 2  %} {{ value_json.state }} {% endif %}'
   - platform: mqtt_json
-    name: lichtstraat
+    name: "lichtstraat"
     state_topic: "home/rgb1"
     command_topic: "home/rgb1/set"
     brightness: true
     rgb: true
     optimistic: false
     qos: 0
-
-script: !include scripts.yaml
-
-device_tracker:
-  - platform: luci
-    host: 192.168.0.1
-    username: !secret router_user
-    password: !secret router_pwd
-    track_new_devices: false
-    interval_seconds: 12
-    consider_home: 120
 
 notify:
   - name: doorbell
@@ -217,29 +226,64 @@ notify:
     sender_name: DOORBELL
   - name: dog
     platform: command_line
-    command: "aplay /home/homeassistant/Dog-barking-very-loudly.wav"
+    command: "aplay /root/Dog-barking-very-loudly.wav"
 
-android_ip_webcam:
-  - host: 192.168.0.120
-    name: nexus 4
-    username: !secret camera_user
-    password: !secret camera_pwd
-    sensors:
-    - audio_connections
-    - battery_level
-    - battery_temp
-    - battery_voltage
-    - light
-    - motion
-    - pressure
-    switches:
-    - exposure_lock
-    - ffc
-    - focus
-    - gps_active
-    - night_vision
-    - overlay
-    - torch
-    - whitebalance_lock
-    - video_recording
-    motion_sensor: true
+
+#android_ip_webcam:
+#  - host: 192.168.0.173
+#    name: nexus 4
+#    username: !secret camera_user
+#    password: !secret camera_pwd
+#    sensors:
+#    - audio_connections
+#    - battery_level
+#    - battery_temp
+#    - battery_voltage
+#    - light
+#    - motion
+#    - pressure
+#    switches:
+#    - exposure_lock
+#    - ffc
+#    - focus
+#    - gps_active
+#    - night_vision
+#    - overlay
+#    - torch
+#    - whitebalance_lock
+#    - video_recording
+#    motion_sensor: true
+
+
+script: !include scripts.yaml
+
+device_tracker:
+  - platform: luci
+    host: 192.168.0.1
+    username: !secret router_user
+    password: !secret router_pwd
+    track_new_devices: false
+
+recorder:
+  purge_interval: 3
+  purge_keep_days: 21
+
+xiaomi_aqara:
+  discovery_retry: 5
+  gateways:
+    - key: x7af7nxeb354r7bi
+
+google_assistant:
+  project_id: hass-dcd7f
+  client_id: KOMIUcUtdQj8VBXK66yyj7BBkssp5pbp3Vx8N24XMCMMCNYFReUQl6iGDMtiQ4umZE4RI4vHtJGReFNe
+  access_token: cJYZGCinZObNOJ9Ski8TEFtjshmUh5Bxn9nL2OG5gNB1HnOIW821u8qYUUCocZ70Woruk6SLYpEyZv7s
+  exposed_domains:
+  - switch
+  - light
+  - cover
+  - media_player
+  - group
+  - fan
+  - scene
+  - script
+  - climate
